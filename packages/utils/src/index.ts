@@ -10,3 +10,5 @@ export * from './apply-transforms';
 export * from './fs-operations';
 export * from './global-lru-cache';
 export * from './flat-string';
+export * from './jitExecute';
+export * from './meshDefaultCreateProxyingResolver';

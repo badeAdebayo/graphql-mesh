@@ -19,8 +19,9 @@ import {
   KeyValueCache,
   MeshPubSub,
 } from '@graphql-mesh/types';
-import { set } from 'lodash';
 import { OasTitlePathMethodObject } from './openapi-to-graphql/types/options';
+import { GraphQLInputType } from 'graphql-compose/lib/graphql';
+import { GraphQLID } from 'graphql';
 
 interface OpenAPIIntrospectionCache {
   spec?: Oas3;
@@ -117,8 +118,16 @@ export default class OpenAPIHandler implements MeshHandler {
                   operationType = GraphQLOperationType.Mutation;
                   break;
               }
-              set(acc, `${curr.title}.${curr.path}.${curr.method}`, operationType);
-              return acc;
+              return {
+                ...acc,
+                [curr.title]: {
+                  ...acc[curr.title],
+                  [curr.path]: {
+                    ...((acc[curr.title] && acc[curr.title][curr.path]) || {}),
+                    [curr.method]: operationType,
+                  },
+                },
+              };
             }, {} as OasTitlePathMethodObject<GraphQLOperationType>),
       addLimitArgument: addLimitArgument === undefined ? true : addLimitArgument,
       sendOAuthTokenInQuery: true,
@@ -174,7 +183,7 @@ export default class OpenAPIHandler implements MeshHandler {
 
     for (const rootField of rootFields) {
       for (const argName in args) {
-        const argConfig = args[argName];
+        const { type } = args[argName];
         rootField.args.push({
           name: argName,
           description: undefined,
@@ -182,7 +191,7 @@ export default class OpenAPIHandler implements MeshHandler {
           extensions: undefined,
           astNode: undefined,
           deprecationReason: undefined,
-          ...argConfig,
+          type: (schema.getType(type) as GraphQLInputType) || GraphQLID,
         });
       }
     }

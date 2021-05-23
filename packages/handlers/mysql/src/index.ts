@@ -13,14 +13,16 @@ import {
   GraphQLDate,
   GraphQLTimestamp,
   GraphQLTime,
+  GraphQLUnsignedInt,
+  GraphQLUnsignedFloat,
 } from 'graphql-scalars';
-import { print, specifiedDirectives } from 'graphql';
-import { globalLruCache, loadFromModuleExportExpression } from '@graphql-mesh/utils';
+import { specifiedDirectives } from 'graphql';
+import { loadFromModuleExportExpression, jitExecutorFactory } from '@graphql-mesh/utils';
 import { ExecutionParams } from '@graphql-tools/delegate';
-import { compileQuery, isCompiledQuery } from 'graphql-jit';
 
 const SCALARS = {
   bigint: 'BigInt',
+  'bigint unsigned': 'BigInt',
   binary: 'String',
   bit: 'Int',
   blob: 'String',
@@ -33,13 +35,19 @@ const SCALARS = {
   datetime: 'DateTime',
 
   dec: 'Float',
+  'dec unsigned': 'UnsignedFloat',
   decimal: 'Float',
+  'decimal unsigned': 'UnsignedFloat',
   double: 'Float',
+  'double unsigned': 'UnsignedFloat',
 
   float: 'Float',
+  'float unsigned': 'UnsignedFloat',
 
   int: 'Int',
+  'int unsigned': 'UnsignedInt',
   integer: 'Int',
+  'integer unsigned': 'UnsignedInt',
 
   json: 'JSON',
 
@@ -48,17 +56,21 @@ const SCALARS = {
 
   mediumblob: 'String',
   mediumint: 'Int',
+  'mediumint unsigned': 'UnsignedInt',
   mediumtext: 'String',
 
   numeric: 'Float',
+  'numeric unsigned': 'UnsignedFloat',
 
   smallint: 'Int',
+  'smallint unsigned': 'UnsignedInt',
 
   text: 'String',
   time: 'Time',
   timestamp: 'Timestamp',
   tinyblob: 'String',
   tinyint: 'Int',
+  'tinyint unsigned': 'UnsignedInt',
   tinytext: 'String',
 
   varbinary: 'String',
@@ -79,17 +91,20 @@ type MysqlPromisifiedConnection = ThenArg<ReturnType<typeof MySQLHandler.prototy
 type MysqlContext = { mysqlConnection: MysqlPromisifiedConnection };
 
 export default class MySQLHandler implements MeshHandler {
+  private name: string;
   private config: YamlConfig.MySQLHandler;
   private baseDir: string;
   private pubsub: MeshPubSub;
   private introspectionCache: MySQLIntrospectionCache;
 
   constructor({
+    name,
     config,
     baseDir,
     pubsub,
     introspectionCache = {},
   }: GetMeshSourceOptions<YamlConfig.MySQLHandler, MySQLIntrospectionCache>) {
+    this.name = name;
     this.config = config;
     this.baseDir = baseDir;
     this.pubsub = pubsub;
@@ -177,6 +192,8 @@ export default class MySQLHandler implements MeshHandler {
     schemaComposer.add(GraphQLTime);
     schemaComposer.add(GraphQLDateTime);
     schemaComposer.add(GraphQLTimestamp);
+    schemaComposer.add(GraphQLUnsignedInt);
+    schemaComposer.add(GraphQLUnsignedFloat);
     schemaComposer.createEnumTC({
       name: 'OrderBy',
       values: {
@@ -256,6 +273,10 @@ export default class MySQLHandler implements MeshHandler {
                 }, {} as EnumTypeComposerValueConfigDefinition),
               });
               type = enumTypeName;
+            }
+            if (!type) {
+              console.warn(`${realTypeName} couldn't be mapped to a type. It will be mapped to JSON as a fallback.`);
+              type = 'JSON';
             }
             if (tableField.Null.toLowerCase() === 'no') {
               type += '!';
@@ -456,23 +477,11 @@ export default class MySQLHandler implements MeshHandler {
 
     introspectionConnection.connection.release();
 
+    const jitExecutor = jitExecutorFactory(schema, this.name);
     const executor: any = async ({ document, variables, context: meshContext, info }: ExecutionParams) => {
-      const operationName = info?.operation.name?.value;
-      const documentStr = typeof document === 'string' ? document : print(document);
-      const cacheKey = [documentStr, operationName].join('_');
-      if (!globalLruCache.has(cacheKey)) {
-        const compiledQuery = compileQuery(schema, document, operationName);
-        globalLruCache.set(cacheKey, compiledQuery);
-      }
-      const cachedQuery = globalLruCache.get(cacheKey);
-      if (isCompiledQuery(cachedQuery)) {
-        const mysqlConnection = await this.getPromisifiedConnection(pool);
-        const contextValue = { ...meshContext, mysqlConnection };
-        const result = await cachedQuery.query(info?.rootValue, contextValue, variables);
-        mysqlConnection.connection.release();
-        return result;
-      }
-      return cachedQuery;
+      const mysqlConnection = await this.getPromisifiedConnection(pool);
+      const contextValue = { ...meshContext, mysqlConnection };
+      return jitExecutor({ document, variables, context: contextValue, info });
     };
 
     return {

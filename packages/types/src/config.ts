@@ -166,6 +166,11 @@ export interface Source {
    * List of transforms to apply to the current API source, before unifying it with the rest of the sources
    */
   transforms?: Transform[];
+  /**
+   * Type Merging Configuration
+   * https://www.graphql-tools.com/docs/stitch-type-merging
+   */
+  typeMerging?: MergedTypeConfig[];
 }
 /**
  * Point to the handler you wish to use, it can either be a predefined handler, or a custom
@@ -230,6 +235,10 @@ export interface GraphQLHandler {
    * Path to a custom W3 Compatible WebSocket Implementation
    */
   webSocketImpl?: string;
+  /**
+   * Use legacy web socket protocol `graphql-ws` instead of the more current standard `graphql-transport-ws`
+   */
+  useWebSocketLegacyProtocol?: boolean;
   /**
    * Path to the introspection
    * You can seperately give schema introspection
@@ -1031,6 +1040,10 @@ export interface MockingConfig {
    * Mock configurations
    */
   mocks?: MockingFieldConfig[];
+  /**
+   * The path to the code runs before the store is attached to the schema
+   */
+  initializeStore?: any;
 }
 export interface MockingFieldConfig {
   /**
@@ -1057,6 +1070,31 @@ export interface MockingFieldConfig {
    * Both "moduleName#exportName" or only "moduleName" would work
    */
   custom?: string;
+  /**
+   * Length of the mock list
+   * For the list types `[ObjectType]`, how many `ObjectType` you want to return?
+   * default: 2
+   */
+  length?: number;
+  store?: GetFromMockStoreConfig;
+  /**
+   * Update the data on the mock store
+   */
+  updateStore?: UpdateMockStoreConfig[];
+}
+/**
+ * Get the data from the mock store
+ */
+export interface GetFromMockStoreConfig {
+  type?: string;
+  key?: string;
+  fieldName?: string;
+}
+export interface UpdateMockStoreConfig {
+  type?: string;
+  key?: string;
+  fieldName?: string;
+  value?: string;
 }
 /**
  * Transformer to apply naming convention to GraphQL Types
@@ -1209,6 +1247,26 @@ export interface SnapshotTransformConfig {
    * This might be needed for the handlers like Postgraphile or OData that rely on the incoming GraphQL operation.
    */
   respectSelectionSet?: boolean;
+}
+export interface MergedTypeConfig {
+  typeName?: string;
+  fieldName?: string;
+  args?: any;
+  argsFromKeys?: any;
+  selectionSet?: string;
+  fields?: MergedFieldConfig[];
+  key?: any;
+  canonical?: boolean;
+  /**
+   * Any of: String, AdditionalStitchingResolverObject, AdditionalSubscriptionObject
+   */
+  resolve?: string | AdditionalStitchingResolverObject | AdditionalSubscriptionObject;
+}
+export interface MergedFieldConfig {
+  fieldName?: string;
+  selectionSet?: string;
+  computed?: boolean;
+  canonical?: boolean;
 }
 export interface AdditionalStitchingResolverObject {
   type: string;

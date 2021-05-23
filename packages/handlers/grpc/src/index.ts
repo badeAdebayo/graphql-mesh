@@ -1,4 +1,4 @@
-import './patchLongBits';
+import './patchLongJs';
 import { GetMeshSourceOptions, KeyValueCache, MeshHandler, YamlConfig } from '@graphql-mesh/types';
 import { withCancel } from '@graphql-mesh/utils';
 import {
@@ -77,21 +77,24 @@ export default class GrpcHandler implements MeshHandler {
       if (this.config.useReflection) {
         const grpcReflectionServer = this.config.endpoint;
         const reflectionClient = new grpcReflection.Client(grpcReflectionServer, creds);
-        const services = (await reflectionClient.listServices()) as string[];
-        const serviceRoots = await Promise.all(
-          services
-            .filter(s => !s?.startsWith('grpc.'))
-            .map((service: string) => reflectionClient.fileContainingSymbol(service))
-        );
-        serviceRoots.forEach((serviceRoot: Root) => {
-          if (serviceRoot.nested) {
-            for (const namespace in serviceRoot.nested) {
-              if (Object.prototype.hasOwnProperty.call(serviceRoot.nested, namespace)) {
-                root.add(serviceRoot.nested[namespace]);
+        await reflectionClient.listServices().then(services =>
+          Promise.all(
+            services.map(async (service: string | void) => {
+              if (service && !service.startsWith('grpc.')) {
+                return reflectionClient.fileContainingSymbol(service).then(serviceRoot => {
+                  if (serviceRoot.nested) {
+                    for (const namespace in serviceRoot.nested) {
+                      if (Object.prototype.hasOwnProperty.call(serviceRoot.nested, namespace)) {
+                        root.add(serviceRoot.nested[namespace]);
+                      }
+                    }
+                  }
+                });
               }
-            }
-          }
-        });
+              return null;
+            })
+          )
+        );
         root.resolveAll();
       } else if (this.config.descriptorSetFilePath) {
         let fileName = this.config.descriptorSetFilePath;
@@ -109,9 +112,9 @@ export default class GrpcHandler implements MeshHandler {
         const descriptorSetRoot = (Root as RootConstructor).fromDescriptor(decodedDescriptorSet);
         root.add(descriptorSetRoot);
       } else {
-        let fileName = this.config.protoFilePath;
+        let fileName: string;
         let options: LoadOptions = {};
-        if (typeof this.config.protoFilePath === 'object' && this.config.protoFilePath.file) {
+        if (typeof this.config.protoFilePath === 'object') {
           fileName = this.config.protoFilePath.file;
           options = {
             ...this.config.protoFilePath.load,
@@ -125,9 +128,11 @@ export default class GrpcHandler implements MeshHandler {
             }
             addIncludePathResolver(root, options.includeDirs);
           }
+        } else {
+          fileName = this.config.protoFilePath;
         }
 
-        const protoDefinition = await root.load(fileName as string, options);
+        const protoDefinition = await root.load(fileName, options);
         protoDefinition.resolveAll();
       }
       this.introspectionCache.rootJson = root.toJSON({
@@ -170,14 +175,14 @@ export default class GrpcHandler implements MeshHandler {
       fields: {
         status: {
           type: 'String',
-          descripton: 'status string',
+          description: 'status string',
         },
       },
     });
 
     const { rootJson, descriptorSetJson } = await this.getCachedRootJson(creds);
     const decodedDescriptorSet = await descriptor.FileDescriptorSet.fromObject(descriptorSetJson);
-    const packageDefinition = await loadFileDescriptorSetFromObject(decodedDescriptorSet);
+    const packageDefinition = loadFileDescriptorSetFromObject(decodedDescriptorSet);
 
     const grpcObject = loadPackageDefinition(packageDefinition);
 

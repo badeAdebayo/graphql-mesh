@@ -1,12 +1,12 @@
 {
   "name": "@graphql-mesh/utils",
-  "version": "0.10.0",
+  "version": "0.11.4",
   "license": "MIT",
   "peerDependencies": {
     "graphql": "*"
   },
   "devDependencies": {
-    "@types/is-url": "1.2.28"
+    "@types/is-url": "1.2.29"
   },
   "sideEffects": false,
   "main": "dist/index.cjs.js",
@@ -16,14 +16,15 @@
     "definition": "dist/index.d.ts"
   },
   "dependencies": {
-    "@ardatan/string-interpolation": "1.2.11",
-    "@graphql-tools/delegate": "7.1.2",
-    "@graphql-tools/utils": "7.7.3",
+    "@ardatan/string-interpolation": "1.2.12",
+    "@graphql-tools/delegate": "7.1.5",
+    "@graphql-tools/utils": "7.10.0",
     "@graphql-typed-document-node/core": "3.1.0",
     "cross-fetch": "3.1.4",
-    "date-fns": "2.21.1",
+    "date-fns": "2.21.3",
     "fetchache": "0.1.1",
     "flatstr": "1.0.12",
+    "graphql-jit": "0.5.1",
     "is-url": "1.2.4",
     "js-yaml": "4.1.0",
     "object-hash": "2.1.1",

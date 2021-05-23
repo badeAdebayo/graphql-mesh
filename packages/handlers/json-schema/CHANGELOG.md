@@ -1,5 +1,75 @@
 # @graphql-mesh/json-schema
 
+## 0.15.0
+
+### Minor Changes
+
+- ee86d8fa7: feat(jsonSchema): support application/x-www-form-urlencoded
+
+## 0.14.8
+
+### Patch Changes
+
+- 7d0e33660: fix(utils): support annotations in argTypeMap
+- Updated dependencies [7d0e33660]
+  - @graphql-mesh/utils@0.11.4
+
+## 0.14.7
+
+### Patch Changes
+
+- Updated dependencies [cfb517b3d]
+  - @graphql-mesh/types@0.42.0
+
+## 0.14.6
+
+### Patch Changes
+
+- Updated dependencies [3c4c51100]
+  - @graphql-mesh/utils@0.11.3
+
+## 0.14.5
+
+### Patch Changes
+
+- Updated dependencies [e6acdbd7d]
+  - @graphql-mesh/types@0.41.1
+  - @graphql-mesh/utils@0.11.2
+
+## 0.14.4
+
+### Patch Changes
+
+- Updated dependencies [69c89666d]
+  - @graphql-mesh/utils@0.11.1
+
+## 0.14.3
+
+### Patch Changes
+
+- Updated dependencies [214b7a23c]
+  - @graphql-mesh/types@0.41.0
+
+## 0.14.2
+
+### Patch Changes
+
+- Updated dependencies [0d2f7bfcd]
+  - @graphql-mesh/types@0.40.0
+
+## 0.14.1
+
+### Patch Changes
+
+- Updated dependencies [1caa8ffd3]
+  - @graphql-mesh/utils@0.11.0
+
+## 0.14.0
+
+### Minor Changes
+
+- efae58591: feat(json-schema): support custom number scalars
+
 ## 0.13.1
 
 ### Patch Changes

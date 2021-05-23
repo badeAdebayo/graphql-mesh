@@ -1,5 +1,102 @@
 # openapi-react-weatherbit
 
+## 0.3.77
+
+### Patch Changes
+
+- Updated dependencies [7d0e33660]
+  - @graphql-mesh/openapi@0.16.9
+  - @graphql-mesh/merger-bare@0.9.9
+  - @graphql-mesh/runtime@0.16.5
+  - @graphql-mesh/transform-cache@0.8.48
+
+## 0.3.76
+
+### Patch Changes
+
+- @graphql-mesh/cache-localforage@0.5.5
+- @graphql-mesh/openapi@0.16.8
+- @graphql-mesh/merger-bare@0.9.8
+- @graphql-mesh/runtime@0.16.4
+- @graphql-mesh/transform-cache@0.8.47
+
+## 0.3.75
+
+### Patch Changes
+
+- Updated dependencies [3c4c51100]
+  - @graphql-mesh/merger-bare@0.9.7
+  - @graphql-mesh/runtime@0.16.3
+  - @graphql-mesh/openapi@0.16.7
+  - @graphql-mesh/transform-cache@0.8.46
+
+## 0.3.74
+
+### Patch Changes
+
+- Updated dependencies [e6acdbd7d]
+  - @graphql-mesh/merger-bare@0.9.6
+  - @graphql-mesh/runtime@0.16.2
+  - @graphql-mesh/transform-cache@0.8.45
+  - @graphql-mesh/cache-localforage@0.5.4
+  - @graphql-mesh/openapi@0.16.6
+
+## 0.3.73
+
+### Patch Changes
+
+- @graphql-mesh/openapi@0.16.5
+- @graphql-mesh/merger-bare@0.9.5
+- @graphql-mesh/runtime@0.16.1
+- @graphql-mesh/transform-cache@0.8.44
+
+## 0.3.72
+
+### Patch Changes
+
+- Updated dependencies [214b7a23c]
+  - @graphql-mesh/runtime@0.16.0
+  - @graphql-mesh/cache-localforage@0.5.3
+  - @graphql-mesh/openapi@0.16.4
+  - @graphql-mesh/merger-bare@0.9.4
+  - @graphql-mesh/transform-cache@0.8.43
+
+## 0.3.71
+
+### Patch Changes
+
+- Updated dependencies [1f4655ee6]
+  - @graphql-mesh/runtime@0.15.0
+
+## 0.3.70
+
+### Patch Changes
+
+- @graphql-mesh/cache-localforage@0.5.2
+- @graphql-mesh/openapi@0.16.3
+- @graphql-mesh/merger-bare@0.9.3
+- @graphql-mesh/runtime@0.14.1
+- @graphql-mesh/transform-cache@0.8.42
+
+## 0.3.69
+
+### Patch Changes
+
+- Updated dependencies [1caa8ffd3]
+  - @graphql-mesh/runtime@0.14.0
+  - @graphql-mesh/openapi@0.16.2
+  - @graphql-mesh/merger-bare@0.9.2
+  - @graphql-mesh/transform-cache@0.8.41
+
+## 0.3.68
+
+### Patch Changes
+
+- Updated dependencies [9f204b0cf]
+- Updated dependencies [58e6ab59e]
+  - @graphql-mesh/transform-cache@0.8.40
+  - @graphql-mesh/openapi@0.16.1
+
 ## 0.3.67
 
 ### Patch Changes
